@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>טריוויה - שירים של אריק איינשטיין</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        #game-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #lyric {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .option {
+            background-color: #e0e0e0;
+            border: none;
+            color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        .option:hover {
+            background-color: #d0d0d0;
+        }
+        .feedback {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        #score {
+            font-size: 20px;
+            margin: 20px 0;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>טריוויה - שירים של אריק איינשטיין</h1>
+        <div id="score">ניקוד: 0/6</div>
+        <div id="lyric"></div>
+        <div id="options"></div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-btn" style="display:none;">שאלה הבאה</button>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                lyric: "מה שהרס אותי היה הצחוק שהיה לך בעיניים",
+                options: [
+                    "עטור מצחך זהב שחור", 
+                    "אגדת דשא", 
+                    "צער לך וצער לי", 
+                    "אהבה ממבט ראשון"
+                ],
+                correct_answer: "אהבה ממבט ראשון",
+                hint: "שיר עם מסר רגשי עמוק"
+            },
+            {
+                lyric: "כאן שנינו לבד פוסעים יד ביד",
+                options: [
+                    "לי ולך", 
+                    "אני אוהב אותך היום", 
+                    "עטור מצחך זהב שחור", 
+                    "עוד יהיה"
+                ],
+                correct_answer: "לי ולך",
+                hint: "שיר רומנטי על זוגיות"
+            },
+            {
+                lyric: "פעם ראיתי מרפסת בלי אור, טיפסתי אליה לאורך צינור",
+                options: [
+                    "צא מזה", 
+                    "אדוני השופט", 
+                    "העיר הלבנה", 
+                    "עוד יהיה"
+                ],
+                correct_answer: "אדוני השופט",
+                hint: "שיר עם מוטיב משפטי"
+            },
+            {
+                lyric: "בין האפל לנסתר, בעולמנו המר, אומרים שיש עוד תקווה, קוראים לזה אהבה",
+                options: [
+                    "בגללך", 
+                    "שיר אהבה סטנדרטי", 
+                    "יש בי אהבה", 
+                    "זו אותה האהבה"
+                ],
+                correct_answer: "יש בי אהבה",
+                hint: "שיר עם מסר עמוק על אהבה"
+            },
+            {
+                lyric: "אמרו את זה קודם לפני",
+                options: [
+                    "אני ואתה", 
+                    "עוף גוזל", 
+                    "פראג", 
+                    "כשאת בוכה את לא יפה"
+                ],
+                correct_answer: "אני ואתה",
+                hint: "שיר עם מסר על יחסים"
+            },
+            {
+                lyric: "תמיד ידעתי שיבוא היום שבו צריך להיפרד",
+                options: [
+                    "עוף גוזל", 
+                    "רק איתך", 
+                    "הכניסיני תחת כנפך", 
+                    "פסק זמן"
+                ],
+                correct_answer: "עוף גוזל",
+                hint: "שיר מפורסם על פרידה"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        const lyricEl = document.getElementById('lyric');
+        const optionsEl = document.getElementById('options');
+        const feedbackEl = document.getElementById('feedback');
+        const scoreEl = document.getElementById('score');
+        const nextBtn = document.getElementById('next-btn');
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            lyricEl.textContent = question.lyric;
+            
+            optionsEl.innerHTML = '';
+            const shuffledOptions = shuffleArray([...question.options]);
+            
+            shuffledOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.textContent = option;
+                btn.classList.add('option');
+                btn.addEventListener('click', () => checkAnswer(option));
+                optionsEl.appendChild(btn);
+            });
+
+            feedbackEl.textContent = '';
+            nextBtn.style.display = 'none';
+        }
+
+        function checkAnswer(selectedOption) {
+            const currentQ = questions[currentQuestion];
+            
+            if (selectedOption === currentQ.correct_answer) {
+                score++;
+                feedbackEl.textContent = '✅ תשובה נכונה! מצוין!';
+                feedbackEl.classList.add('correct');
+                feedbackEl.classList.remove('incorrect');
+            } else {
+                feedbackEl.textContent = `❌ לא נכון. התשובה הנכונה היא: ${currentQ.correct_answer}. ${currentQ.hint}`;
+                feedbackEl.classList.add('incorrect');
+                feedbackEl.classList.remove('correct');
+            }
+
+            scoreEl.textContent = `ניקוד: ${score}/${questions.length}`;
+            
+            // Disable option buttons
+            document.querySelectorAll('.option').forEach(btn => {
+                btn.disabled = true;
+            });
+
+            nextBtn.style.display = 'block';
+            nextBtn.onclick = nextQuestion;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            const percentage = (score / questions.length) * 100;
+            
+            if (percentage === 100) {
+                lyricEl.textContent = '👑 מושלם! אתה מומחה לשירים של אריק איינשטיין!';
+            } else if (percentage >= 80) {
+                lyricEl.textContent = '👏 מרשים! אתה מכיר מאוד טוב את השירים!';
+            } else if (percentage >= 60) {
+                lyricEl.textContent = '👍 לא רע! יש לך ידע טוב על אריק איינשטיין.';
+            } else {
+                lyricEl.textContent = '🎵 תמשיך ללמוד ולהאזין לשירים!';
+            }
+
+            optionsEl.innerHTML = '';
+            feedbackEl.textContent = '';
+            nextBtn.style.display = 'none';
+        }
+
+        // Start the game
+        loadQuestion();
+    </script>
+</body>
+</html>
